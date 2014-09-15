@@ -12,22 +12,27 @@ var React  = require('react')
 
 var btn = require('../common/btn.jsx')
   , propTypes = {
-      value:          React.PropTypes.any,
-      onChange:       React.PropTypes.func,
+      value:                React.PropTypes.any,
+      onChange:             React.PropTypes.func,
 
-      itemComponent:  React.PropTypes.func,
+      itemComponent:        React.PropTypes.func,
       
-      data:           React.PropTypes.array,
-      valueField:     React.PropTypes.string,
-      textField:      React.PropTypes.string,
+      data:                 React.PropTypes.array,
+      valueField:           React.PropTypes.string,
+      textField:            React.PropTypes.string,
 
-      suggest:        React.PropTypes.bool,
-      busy:           React.PropTypes.bool,
+      suggest:              React.PropTypes.bool,
+      busy:                 React.PropTypes.bool,
 
-      messages:       React.PropTypes.shape({
-        open:         React.PropTypes.string,
-        emptyList:    React.PropTypes.string,
-        emptyFilter:  React.PropTypes.string
+      virtualScroll:        React.PropTypes.shape({
+        initialItems:       React.PropTypes.number,
+        itemHeight:         React.PropTypes.number,
+      }),
+      
+      messages:             React.PropTypes.shape({
+        open:               React.PropTypes.string,
+        emptyList:          React.PropTypes.string,
+        emptyFilter:        React.PropTypes.string
       })
     };
 
@@ -167,6 +172,8 @@ module.exports = React.createClass({
               style={{ maxHeight: 200, height: 'auto' }}
               data={items} 
               value={this.props.value}
+              initialItems={(this.props.virtualScroll || {}).initialItems}
+              itemHeight={(this.props.virtualScroll || {}).itemHeight}
               selectedIndex={this.state.selectedIndex}
               focusedIndex={this.state.selectedIndex === -1 
                 ? this.state.focusedIndex 
@@ -338,7 +345,7 @@ module.exports = React.createClass({
   process: function(data, values, searchTerm){
 
     if( this.props.filter && searchTerm)
-      data = this.filter(data, searchTerm)
+      data =  _.filter(data, this.matcher(searchTerm))
 
     return data
   },

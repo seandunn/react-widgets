@@ -20,21 +20,24 @@ var btn = require('../common/btn.jsx')
 
 var propTypes = {
   //main input interface
-  value:          React.PropTypes.any,
-  onChange:       React.PropTypes.func,
+  value:                React.PropTypes.any,
+  onChange:             React.PropTypes.func,
 
-  data:           React.PropTypes.array,
-  valueField:     React.PropTypes.string,
-  textField:      React.PropTypes.string,
+  data:                 React.PropTypes.array,
+  valueField:           React.PropTypes.string,
+  textField:            React.PropTypes.string,
 
-  valueComponent: React.PropTypes.component,
-  itemComponent:  React.PropTypes.component,
-  busy:           React.PropTypes.bool,
-  
-  delay:          React.PropTypes.number,
+  valueComponent:       React.PropTypes.component,
+  itemComponent:        React.PropTypes.component,
+  initialVisibleItems:  React.PropTypes.number,
+  itemHeight:           React.PropTypes.number,
 
-  messages:       React.PropTypes.shape({
-    open:         React.PropTypes.string,
+  busy:                 React.PropTypes.bool,
+  delay:                React.PropTypes.number,
+
+
+  messages:             React.PropTypes.shape({
+    open:               React.PropTypes.string,
   })
 };
 
@@ -133,8 +136,8 @@ module.exports = React.createClass({
               style={{ maxHeight: 200, height: 'auto' }}
               data={this.props.data} 
               value={this.props.value}
-              initialVisibleItems={this.props.initialBufferSize}
-              itemHeight={18}
+              initialVisibleItems={(this.props.virtual || {}).initialVisibleItems}
+              itemHeight={(this.props.virtual || {}).itemHeight}
               selectedIndex={this.state.selectedIndex}
               focusedIndex={this.state.focusedIndex}
               textField={this.props.textField} 

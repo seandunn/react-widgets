@@ -21,8 +21,11 @@ var React = require('react')
 module.exports = {
 
   shouldComponentUpdate: function(nextProps, nextState) {
-    return !shallowEqual(this.props, nextProps) ||
-           !shallowEqual(this.state, nextState);
+    var render = !shallowEqual(this.props, nextProps) 
+               || !shallowEqual(this.state, nextState)
+
+    //console.log('should update: ', render)
+    return render;
   }
 }
 

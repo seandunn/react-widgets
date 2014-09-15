@@ -66,6 +66,13 @@ h3 > .default {
   }
 }
 
+
+@media (max-width: 767px) {
+  .default {
+    display: block;
+  }
+}
+
 pre[class*='language-'] > code[data-language] {
   overflow: auto;
   height: auto;

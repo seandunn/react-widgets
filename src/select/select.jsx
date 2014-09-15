@@ -12,20 +12,25 @@ var React = require('react')
 
 var btn = require('../common/btn.jsx')
   , propTypes = {
-      data:           React.PropTypes.array,
-      value:          React.PropTypes.array,
-      onChange:       React.PropTypes.func,
+      data:                 React.PropTypes.array,
+      value:                React.PropTypes.array,
+      onChange:             React.PropTypes.func,
 
-      valueField:     React.PropTypes.string,
-      textField:      React.PropTypes.string,
+      valueField:           React.PropTypes.string,
+      textField:            React.PropTypes.string,
 
-      tagComponent:   React.PropTypes.func,
-      itemComponent:  React.PropTypes.func,
+      tagComponent:         React.PropTypes.func,
+      itemComponent:        React.PropTypes.func,
 
-      messages:       React.PropTypes.shape({
-        open:         React.PropTypes.string,
-        emptyList:    React.PropTypes.string,
-        emptyFilter:  React.PropTypes.string
+      virtualScroll:        React.PropTypes.shape({
+        initialItems:       React.PropTypes.number,
+        itemHeight:         React.PropTypes.number,
+      }),
+
+      messages:             React.PropTypes.shape({
+        open:               React.PropTypes.string,
+        emptyList:          React.PropTypes.string,
+        emptyFilter:        React.PropTypes.string
       })
     };
 
@@ -34,6 +39,7 @@ module.exports = React.createClass({
   displayName: 'Select',
   
   mixins: [ 
+    require('../mixins/PureRenderMixin'),
     require('../mixins/DataHelpersMixin'),
     require('../mixins/DataFilterMixin'),
     require('../mixins/RtlParentContextMixin'),
@@ -69,6 +75,7 @@ module.exports = React.createClass({
         , nextProps.value
         , this.state.searchTerm)
 
+    //console.log('select render: ', nextProps.data === this.props.data, nextProps.value === this.props.value)
     this.setState({
       processedData: items
     })
@@ -135,6 +142,8 @@ module.exports = React.createClass({
               textField={this.props.textField} 
               valueField={this.props.valueField}
               focusedIndex={this.state.focusedIndex}
+              initialItems={(this.props.virtualScroll || {}).initialItems}
+              itemHeight={(this.props.virtualScroll || {}).itemHeight}
               onSelect={this._onSelect}
               listItem={this.props.itemComponent}
               messages={{
@@ -266,17 +275,11 @@ module.exports = React.createClass({
   },
 
   process: function(data, values, searchTerm){
-    var items = _.reject(data, function(i){
-        return _.any(
-            values
-          , _.partial(this._valueMatcher, i)
-          , this)
-      }, this)
+    var matches = this.matcher(searchTerm)
 
-    if( searchTerm)
-      items = this.filter(items, searchTerm)
-
-    return items
+    return _.reject(data, function(i){
+      return _.any(values, _.partial(this._valueMatcher, i), this) || !matches(i)
+    }, this)
   },
 
   _placeholder: function(){

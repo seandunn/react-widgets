@@ -62,11 +62,24 @@ var Docs = React.createClass({
               <h2>Install</h2>
               <p>
                 The prefered way is to use NPM <code>npm install react-widgets</code> and make use of something like Webpack or 
-                Browserify to bundle the lib. 
+                Browserify to bundle your required widgets. 
                 There is also a traditional browser build available for download in the <strong>browser</strong> folder. 
                 It does not bundle any dependencies listed below, and 
                 attaches itself to the <code>window</code> as <code>ReactWidgets</code>
               </p>
+              <p>
+                Compiled CSS, images, and fonts are found in the <code>dist</code> directory. 
+                Included icons are provided by - <a href="http://fontawesome.io">Font Awesome by Dave Gandy</a>
+              </p>
+              <p>
+                To use either require the entire package: <code>require('react-widgets')</code> or only bundle the widgets you use, by 
+                requiring each widget individually: <code>require('react-widgets/lib/dropdown-list')</code>.
+              </p>
+              <strong>
+                Note: prior to 1.1.0 when requiring react-widgets as a CommonJS module you also need to transpile the 
+                module from jsx. As of 1.1.0 the package comes precompiled :)
+              </strong>
+              
               <p>
                 Compiled CSS, images, and fonts are found in the <code>dist</code> directory. 
                 Included icons are provided by - <a href="http://fontawesome.io">Font Awesome by Dave Gandy</a>
@@ -184,6 +197,21 @@ var Docs = React.createClass({
                 mark whether the widget is in a busy or loading state. If <code>true</code> the widget will display a spinner gif, useful 
                 when loading data via an ajax call.
               </p>
+
+              <h3>virtualScroll <small>Object</small> <span className='default'>false</span></h3>
+              <p>
+                enable virtual scrolling for the widget.
+              </p>
+              <h3>virtualScroll.itemHeight <small>Number</small></h3>
+              <p>
+                The height of each list item. If left empty, the avergage item height will be used. For best results specify a height.
+              </p>
+              <h3>virtualScroll.initialVisibleItems <small>Number</small></h3>
+              <p>
+                Specify how many data items to initially render. After the initial render the widget will determine how many items to 
+                buffer into the DOM based on the height of the dropdown list.
+              </p>
+
               <h3>isRtl <small>Boolean</small></h3>
               <p>
                 mark whether the widget should render right-to-left. This property can also be implicitly passed to the widget through
@@ -347,7 +375,8 @@ var Docs = React.createClass({
             <section>
               <h1 id="number-picker" className="page-header">Number Picker</h1>
               <p>
-                Select an item from the list, or input a custom value. The vombobox can also make suggestions as you type
+                A spinner for selecting numbers, currency and percentages. The number picker uses Globalize.js to handle 
+                number localization.
               </p>
               <NumberPickerExample/>
               <Example code={

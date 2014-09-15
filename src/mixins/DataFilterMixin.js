@@ -1,20 +1,11 @@
 var React   = require('react')
   , filters = require('../util/filter')
   , helper  = require('../mixins/DataHelpersMixin')
-  , setter  = require('../util/stateSetter')
-  , compose = require('../util/compose')
-  , directions = require('../util/constants').directions
   , _      = require('lodash');
 
-var ifValueChanges = compose.provided(function(props){
-      return !_.isEqual(props.value, this.props.value)
-    })
-  , indexExists = compose.provided(function(idx){
-      return idx >= 0
-    })
 
 var filterTypes = _.without(_.keys(filters), 'filter')
-  , setIndex = indexExists(setter('selectedIndex'))
+
 
 module.exports = {
   
@@ -36,24 +27,25 @@ module.exports = {
       }
     },
 
-    filter: function(items, searchTerm){
-      var matches = typeof this.props.filter === 'string'
+    matcher: function(searchTerm){
+      var self = this
+        , matches = typeof this.props.filter === 'string'
             ? filters[this.props.filter]
             : this.props.filter;
 
       if ( !matches || !searchTerm || !searchTerm.trim() || searchTerm.length < (this.props.minLength || 1))
-        return items
+        return function(){ return true }
 
       if ( !this.props.caseSensitive)
         searchTerm = searchTerm.toLowerCase();
+      
+      return function matcher(item){
+        item = helper._dataText.call(self, item);
 
-      return _.filter(items, function(item){
-        var val = helper._dataText.call(this, item);
+        if ( !self.props.caseSensitive)
+          item = item.toLowerCase();
 
-        if ( !this.props.caseSensitive)
-          val = val.toLowerCase();
-
-        return matches(val, searchTerm.toLowerCase())
-      }, this)
+        return matches(item, searchTerm)
+      }
     }
   }

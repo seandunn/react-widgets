@@ -64,16 +64,18 @@ module.exports = React.createClass({
 	render: function(){
     var emptyList   = <li>{ this.props.messages.emptyList }</li>
       , emptyFilter = <li>{ this.props.messages.emptyFilter }</li>
+      , len = Math.min(this.state.displayEnd, this.props.data.length - 1)
       , items = [];
 
     if ( this.state.displayStart !== 0)
-      items.push(<li style={{height: this.state.displayStart * this.props.itemHeight}}/>);
+      items.push(<li key='top_pl' style={{height: this.state.displayStart * this.props.itemHeight}}/>);
 
-    console.log('render', this.state.displayEnd)  
-    for (var idx = this.state.displayStart; idx <= this.state.displayEnd; ++idx) {
+    //console.log('render', this.state.displayEnd)  
+    for (var idx = this.state.displayStart; idx <= len; ++idx) {
       var item = this.props.data[idx];
       var focused = idx === this.props.focusedIndex;
 
+      if (!item) debugger;
       items[items.length] = (
           <li 
             key={'item_' + idx}
@@ -94,7 +96,7 @@ module.exports = React.createClass({
     }
     
     if ( this.state.displayEnd !== (this.props.data.length - 1))
-      items.push(<li style={{height:  (this.props.data.length - this.state.displayEnd) * this.props.itemHeight}}/>);
+      items.push(<li key='bottom_pl' style={{height:  (this.props.data.length - this.state.displayEnd) * this.props.itemHeight}}/>);
 
 		return mergeIntoProps(
       _.omit(this.props, 'data', 'selectedIndex'),
@@ -104,7 +106,7 @@ module.exports = React.createClass({
         role='listbox'
         tabIndex="-1" 
         onKeyDown={this._keyDown}
-        onScroll={this.onScroll} 
+        onScroll={this.props.itemHeight && this.onScroll} 
         onKeyPress={this.search}>
         { !this.props.data.length 
           ? emptyList 
