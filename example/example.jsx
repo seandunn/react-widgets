@@ -2,6 +2,7 @@ var React = require('react/addons')
 var Widgets = require('../index')
 var DropdownList = require('../src/dropdowns/Dropdown-List.jsx')
 var Select = require('../src/select/select.jsx')
+var CheckBoxList = require('../src/select/checkboxlist.jsx')
 var Calendar = Widgets.Calendar
 var DatePicker = Widgets.DateTimePicker
 var NumberPicker = Widgets.NumberPicker
@@ -65,7 +66,7 @@ var App = React.createClass({
 							onChange={change.bind(null, 'calValue')}/>
 					</section>
 					<section className="example" style={{ marginBottom: 20 }}>
-					<ComboBox 
+						<ComboBox 
 							isRtl={false}
 							data={ this.state.data } 
 							textField='name'
@@ -80,6 +81,16 @@ var App = React.createClass({
 							value={ this.state.comboboxValue} 
 							onChange={change.bind(null, 'comboboxValue')}/>
 					</section>
+					<section className="example" style={{ marginBottom: 20 }}>
+						<CheckBoxList 
+							isRtl={false}
+							data={ this.state.data } 
+							textField='name'
+							valueField='id'
+							value={ this.state.selectValues } 
+							onChange={change.bind(null, 'selectValues')}/>
+					</section>
+
 					<section className="example" style={{ marginBottom: 20 }}>
 						<Select 
 							isRtl={false}
@@ -111,7 +122,7 @@ var App = React.createClass({
 							format="c"
 							value={this.state.numberValue} 
 							onChange={change.bind(null, 'numberValue')}/>
-// 					</section>
+ 					</section>
 				</div>
 				<div className='clearfix'>
 					<div className='c1' style={{ float: 'left', width: 150, height: 200 }}/>
@@ -138,7 +149,7 @@ React.renderComponent(
 
 				
 function generateList(){
-	var arr = new Array(5000)
+	var arr = new Array(300)
 
 	for(var i = 0; i < arr.length; i++)
 		arr[i] = { id: i + 1, name: chance.name() }
@@ -146,3 +157,4 @@ function generateList(){
 	return arr
 }
 
+					

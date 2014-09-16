@@ -17,7 +17,7 @@ module.exports = {
   },
 
   getDefaultState: function(props) {
-    var bufferSize = props.initialItems || (props.data.length - 1)
+    var bufferSize = props.initialItems || (this._data().length - 1)
 
     return {
       bufferSize: bufferSize * 2.5,
@@ -27,7 +27,7 @@ module.exports = {
       visibleEnd: bufferSize,
 
       displayStart: 0,
-      displayEnd: Math.min(bufferSize * 2, props.data.length - 1)
+      displayEnd: Math.min(bufferSize * 2, this._data().length - 1)
     };
   },
 
@@ -42,7 +42,7 @@ module.exports = {
       this.setState({ 
         visibleItems: visibleItemsCount,
         visibleEnd: visibleItemsCount, 
-        bufferSize: visibleItemsCount * 2 
+        bufferSize: visibleItemsCount * 4
       })
   },
 
@@ -56,15 +56,14 @@ module.exports = {
 
   scrollState: function(scrollTop, props, update) {
     var visibleStart = Math.floor(scrollTop / props.itemHeight)
-      , visibleEnd   = Math.min(visibleStart + this.state.visibleItems, props.data.length - 1)
+      , visibleEnd   = Math.min(visibleStart + this.state.visibleItems, this._data().length - 1)
       , displayStart = Math.max(0, Math.floor(scrollTop / props.itemHeight) - Math.floor(this.state.bufferSize / 2))
-      , displayEnd   = Math.min(displayStart + this.state.bufferSize, props.data.length - 1)
+      , displayEnd   = Math.min(displayStart + this.state.bufferSize, this._data().length - 1)
       , outOfRange   = !(visibleStart >= this.state.displayStart && visibleEnd <= this.state.displayEnd);
 
     //console.log('scroll: ', outOfRange)
     if( this.props.itemHeight && (update || outOfRange) )
       this.setState({
-        bufferSize: this.state.visibleItems * 2,
         visibleStart: visibleStart,
         visibleEnd: visibleEnd,
         displayStart: displayStart,
@@ -74,12 +73,33 @@ module.exports = {
       });
   },
 
-  _itemHeight: function(){
-
-  },
-
   onScroll: function(event) {
     this.scrollState(this.refs.scrollable.getDOMNode().scrollTop, this.props)
+  },
+
+  _eachVisible: function(items, cb, component){
+    var result = []
+      , len = Math.min(this.state.displayEnd, items.length - 1)
+      , pl = component = component || React.DOM.li
+
+    for (var idx = this.state.displayStart; idx <= len; ++idx)
+      result[result.length] = cb.call(this, items[idx], idx, items) ;
+    
+    if ( this.state.displayStart !== 0)
+      result.unshift(pl({ 
+        key: 'top_pl',
+        style: { height: this.state.displayStart * this.props.itemHeight}
+      }));
+
+    if ( this.state.displayEnd !== (this.props.data.length - 1))
+      result.push(pl({
+        key: 'bottom_pl', 
+        style: { 
+          height: (items.length - this.state.displayEnd) * this.props.itemHeight
+        }
+      }));
+
+    return result
   }
 
 }

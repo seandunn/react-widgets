@@ -118,7 +118,32 @@ var DOM = module.exports = {
             return false;
           }
   })(),
-  
+
+  /* jQuery UI | https://github.com/jquery/jquery-ui/blob/bbf9ea0942622a40d1adafeaed7045e0cf6ff8fd/ui/core.js#L51 */
+  scrollParent: function(node) {
+    var position = DOM.css(node, "position" )
+      , excludeStaticParent = position === "absolute"
+      , overflowRegex = /(auto|scroll)/
+      , root = node.ownerDocument || document
+      , scrollParent;
+
+    if ( position === "fixed" ) 
+      return root
+
+    scrollParent = _.find(parents(node), function(parent) {
+
+      if ( excludeStaticParent && DOM.css(parent, "position" ) === "static" )
+        return false;
+      
+      return overflowRegex.test( 
+          DOM.css(parent, "overflow") 
+        + DOM.css(parent, "overflow-y") 
+        + DOM.css(parent, "overflow-x"))
+    });
+
+    return scrollParent || root
+  },
+
   on: function(node, eventName, handler){
     if (node.addEventListener) 
       node.addEventListener(eventName, handler, false);
@@ -196,6 +221,20 @@ var DOM = module.exports = {
       callback && callback.call(this)
     }
   }
+}
+
+function parents(node){
+  var parents = []
+    , current = node;
+
+  while(current){
+    current = current.parentNode
+
+    if( current && current.nodeType !== 9 && parents.indexOf(current) === -1 )
+      parents.push(current)
+  }
+
+  return parents
 }
 
 function getWindow( node ) {

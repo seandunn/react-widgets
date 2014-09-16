@@ -5,6 +5,7 @@ var React   = require('react')
   , mergeIntoProps = transferProps.mergeIntoProps
   , cloneWithProps = transferProps.cloneWithProps
   , cx = require('../util/cx')
+  , $ = require('../util/dom')
   , _  = require('lodash');
 
 var DefaultListItem = React.createClass({
@@ -62,41 +63,41 @@ module.exports = React.createClass({
 
 
 	render: function(){
-    var emptyList   = <li>{ this.props.messages.emptyList }</li>
+    var self = this
+      , emptyList   = <li>{ this.props.messages.emptyList }</li>
       , emptyFilter = <li>{ this.props.messages.emptyFilter }</li>
       , len = Math.min(this.state.displayEnd, this.props.data.length - 1)
-      , items = [];
+      , items;
 
-    if ( this.state.displayStart !== 0)
-      items.push(<li key='top_pl' style={{height: this.state.displayStart * this.props.itemHeight}}/>);
-
-    //console.log('render', this.state.displayEnd)  
-    for (var idx = this.state.displayStart; idx <= len; ++idx) {
-      var item = this.props.data[idx];
-      var focused = idx === this.props.focusedIndex;
-
-      if (!item) debugger;
-      items[items.length] = (
-          <li 
-            key={'item_' + idx}
-            role='option'
-            id={ focused ? this.props.optID : '' }
-            aria-selected={ idx === this.props.selectedIndex }
-            className={cx({ 
-              'rw-state-focus':    focused,
-              'rw-state-selected': idx === this.props.selectedIndex,
-            })}
-            onClick={_.partial(this.props.onSelect, item, idx)}>
-            { this.props.listItem 
-                ? this.props.listItem({ item: item })
-                : this._dataText(item)
-             }
-          </li>
-      );
-    }
     
-    if ( this.state.displayEnd !== (this.props.data.length - 1))
-      items.push(<li key='bottom_pl' style={{height:  (this.props.data.length - this.state.displayEnd) * this.props.itemHeight}}/>);
+    //console.log('render', this.state.displayEnd)  
+    items = this._eachVisible(this.props.data, function(item, idx){
+      var focused = idx === self.props.focusedIndex;
+
+      return (
+        <li 
+          key={'item_' + idx}
+          role='option'
+          id={ focused ? self.props.optID : '' }
+          aria-selected={ idx === self.props.selectedIndex }
+          className={cx({ 
+            'rw-state-focus':    focused,
+            'rw-state-selected': idx === self.props.selectedIndex,
+          })}
+          onClick={_.partial(self.props.onSelect, item, idx)}>
+          { self.props.listItem 
+              ? self.props.listItem({ item: item })
+              : self._dataText(item)
+           }
+        </li>
+      );
+    })
+      
+    // if ( this.state.displayStart !== 0)
+    //   items.unshift(<li key='top_pl' style={{height: this.state.displayStart * this.props.itemHeight}}/>);
+
+    // if ( this.state.displayEnd !== (this.props.data.length - 1))
+    //   items.push(<li key='bottom_pl' style={{height:  (this.props.data.length - this.state.displayEnd) * this.props.itemHeight}}/>);
 
 		return mergeIntoProps(
       _.omit(this.props, 'data', 'selectedIndex'),
@@ -104,16 +105,18 @@ module.exports = React.createClass({
         className="rw-list" 
         ref='scrollable'
         role='listbox'
-        tabIndex="-1" 
-        onKeyDown={this._keyDown}
-        onScroll={this.props.itemHeight && this.onScroll} 
-        onKeyPress={this.search}>
+        tabIndex={this.props.tabIndex || -1}
+        onScroll={this.props.itemHeight && _.throttle(this.onScroll, 10)}>
         { !this.props.data.length 
           ? emptyList 
           : items }
 			</ul>
 		)
 	},
+
+  _data:function(){
+    return this.props.data
+  },
 
   _setScrollPosition: function(){
     var list = this.getDOMNode()
