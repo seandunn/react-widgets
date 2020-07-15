@@ -27,7 +27,7 @@
     "url": "https://github.com/theporchrat/react-widgets"
   },
   "dependencies": {
-    "lodash": "^2.4.1",
+    "lodash": "^4.17.19",
     "globalize": "~0.1.1",
     "date-arithmetic": "~1.0.0"
   },
